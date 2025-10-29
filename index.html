@@ -1,300 +1,97 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Gestor de reglas Outlook (n8n)</title>
-<style>
-  :root { --bg:#0f172a; --card:#111827; --muted:#94a3b8; --ok:#22c55e; --warn:#f59e0b; --err:#ef4444; }
-  * { box-sizing: border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-  body { background:#0b1020; margin:0; padding:24px; color:#e5e7eb; }
-  h1 { font-size:20px; margin:0 0 16px; }
-  .card { background:#0f172a; border:1px solid #1f2937; border-radius:14px; padding:16px; margin-bottom:16px; }
-  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-  label { font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
-  input[type="text"], select, textarea { background:#0b1324; border:1px solid #1f2937; color:#e5e7eb; padding:10px; border-radius:10px; width:100%; }
-  button { background:#2563eb; border:0; color:#fff; padding:10px 14px; border-radius:10px; cursor:pointer; }
-  button.secondary { background:#334155; }
-  button.warn { background:#f59e0b; }
-  button.ok { background:#16a34a; }
-  button:disabled { opacity:.6; cursor:not-allowed; }
-  table { width:100%; border-collapse: collapse; }
-  th, td { border-bottom:1px solid #1f2937; padding:8px; text-align:left; vertical-align:middle; }
-  th { font-size:12px; color:var(--muted); font-weight:600; }
-  .right { text-align:right; }
-  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; }
-  .pill.ok { background:rgba(34,197,94,.15); color:#86efac; }
-  .pill.err { background:rgba(239,68,68,.15); color:#fca5a5; }
-  .muted { color:var(--muted); font-size:12px; }
-  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  footer { margin-top:20px; color:#94a3b8; font-size:12px; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gestor de reglas Outlook (n8n)</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <h1>Gestor de reglas Outlook → n8n</h1>
 
-  <div class="card">
+  <section class="card">
     <div class="row">
-      <div style="flex:2 1 360px;">
+      <div class="col">
         <label>n8n Base URL</label>
         <input id="baseUrl" type="text" placeholder="https://tu-n8n.tld" />
       </div>
-      <div style="flex:2 1 320px;">
+      <div class="col">
         <label>GET folders path</label>
         <input id="foldersPath" type="text" value="/webhook/powerapp/folders" />
       </div>
-      <div style="flex:2 1 320px;">
+      <div class="col">
         <label>POST apply path</label>
         <input id="applyPath" type="text" value="/webhook/powerapp/apply" />
       </div>
-      <div style="flex:1 1 240px;">
+      <div class="col small">
         <label>API Key (header opcional)</label>
         <input id="apiKey" type="text" placeholder="X-API-Key valor" />
       </div>
-      <div style="align-self:end">
+      <div class="actions">
         <button id="btnSaveCfg" class="secondary">Guardar config</button>
         <button id="btnLoadFolders">Cargar carpetas</button>
       </div>
     </div>
-    <div class="muted" style="margin-top:8px">
-      Asegura CORS habilitado en n8n para este origen. En Teams usa pestaña “Website” a esta página.
-    </div>
-  </div>
+    <p class="muted">Asegura CORS habilitado en n8n para este origen. En Teams usa pestaña “Website”.</p>
+  </section>
 
-  <div class="card">
+  <section class="card">
     <div class="row">
-      <div style="flex:1 1 220px;">
+      <div class="col">
         <label>Remitente exacto (from)</label>
         <input id="inFrom" type="text" placeholder="facturas@empresa.com" />
       </div>
-      <div style="flex:1 1 220px;">
+      <div class="col">
         <label>Remitente contiene (fromContains)</label>
         <input id="inFromContains" type="text" placeholder="@cliente.com" />
       </div>
-      <div style="flex:2 1 260px;">
+      <div class="col">
         <label>Asunto contiene (subjectContains)</label>
         <input id="inSubject" type="text" placeholder="Factura" />
       </div>
-      <div style="flex:1 1 240px;">
+      <div class="col">
         <label>Carpeta destino</label>
         <select id="inFolder"><option value="">— Carga carpetas —</option></select>
       </div>
-      <div style="flex:1 1 160px;">
+      <div class="col small">
         <label>Acción</label>
-        <select id="inAction">
-          <option value="copy">copy</option>
-          <option value="move">move</option>
-        </select>
+        <select id="inAction"><option value="copy">copy</option><option value="move">move</option></select>
       </div>
-      <div style="align-self:end">
+      <div class="actions">
         <button id="btnAdd" class="ok">Agregar regla</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="card">
+  <section class="card">
     <table id="tblRules">
       <thead>
         <tr>
-          <th style="width:22%">from</th>
-          <th style="width:22%">fromContains</th>
-          <th style="width:22%">subjectContains</th>
-          <th style="width:22%">targetFolder</th>
-          <th style="width:8%">action</th>
-          <th class="right" style="width:4%"></th>
+          <th>from</th><th>fromContains</th><th>subjectContains</th><th>targetFolder</th><th>action</th><th></th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
-    <div class="row" style="margin-top:12px">
-      <div class="muted">Reglas: <span id="ruleCount">0</span></div>
-      <div style="margin-left:auto">
+    <div class="row end">
+      <span class="muted">Reglas: <span id="ruleCount">0</span></span>
+      <div class="actions">
         <button id="btnClear" class="warn">Limpiar</button>
         <button id="btnApply">Aplicar reglas</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="card">
+  <section class="card">
     <label>Payload</label>
     <textarea id="payload" rows="6" class="mono" readonly></textarea>
-    <div style="height:8px"></div>
+    <div class="spacer"></div>
     <label>Respuesta</label>
     <textarea id="response" rows="6" class="mono" readonly></textarea>
-  </div>
+  </section>
 
-  <footer>
-    Estado: <span id="status" class="pill">listo</span>
-  </footer>
+  <footer class="muted">Estado: <span id="status" class="pill">listo</span></footer>
 
-<script>
-  // --- Config ----
-  const els = {
-    baseUrl: document.getElementById('baseUrl'),
-    foldersPath: document.getElementById('foldersPath'),
-    applyPath: document.getElementById('applyPath'),
-    apiKey: document.getElementById('apiKey'),
-    folderSel: document.getElementById('inFolder'),
-    inFrom: document.getElementById('inFrom'),
-    inFromContains: document.getElementById('inFromContains'),
-    inSubject: document.getElementById('inSubject'),
-    inAction: document.getElementById('inAction'),
-    btnAdd: document.getElementById('btnAdd'),
-    tblBody: document.querySelector('#tblRules tbody'),
-    ruleCount: document.getElementById('ruleCount'),
-    payload: document.getElementById('payload'),
-    response: document.getElementById('response'),
-    status: document.getElementById('status'),
-    btnApply: document.getElementById('btnApply'),
-    btnClear: document.getElementById('btnClear'),
-    btnSaveCfg: document.getElementById('btnSaveCfg'),
-    btnLoadFolders: document.getElementById('btnLoadFolders'),
-  };
-
-  // Persistencia simple
-  const saveCfg = () => {
-    const cfg = {
-      baseUrl: els.baseUrl.value.trim(),
-      foldersPath: els.foldersPath.value.trim(),
-      applyPath: els.applyPath.value.trim(),
-      apiKey: els.apiKey.value.trim()
-    };
-    localStorage.setItem('cfg_n8n_rules', JSON.stringify(cfg));
-    setStatus('config guardada', 'ok');
-  };
-  const loadCfg = () => {
-    const raw = localStorage.getItem('cfg_n8n_rules');
-    if (!raw) return;
-    try {
-      const cfg = JSON.parse(raw);
-      els.baseUrl.value = cfg.baseUrl || '';
-      els.foldersPath.value = cfg.foldersPath || '/webhook/powerapp/folders';
-      els.applyPath.value = cfg.applyPath || '/webhook/powerapp/apply';
-      els.apiKey.value = cfg.apiKey || '';
-    } catch {}
-  };
-
-  function setStatus(text, kind='') {
-    els.status.textContent = text;
-    els.status.className = 'pill ' + (kind==='ok' ? 'ok' : kind==='err' ? 'err' : '');
-  }
-
-  // Regla -> tabla
-  let rules = [];
-  function refreshTable() {
-    els.tblBody.innerHTML = '';
-    rules.forEach((r, idx) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="mono">${escapeHtml(r.from||'')}</td>
-        <td class="mono">${escapeHtml(r.fromContains||'')}</td>
-        <td class="mono">${escapeHtml(r.subjectContains||'')}</td>
-        <td class="mono">${escapeHtml(r.targetFolder||'')}</td>
-        <td><span class="pill ${r.action==='copy'?'ok':''}">${r.action}</span></td>
-        <td class="right"><button class="secondary" data-del="${idx}">✕</button></td>
-      `;
-      els.tblBody.appendChild(tr);
-    });
-    els.ruleCount.textContent = String(rules.length);
-    els.payload.value = JSON.stringify({ rules }, null, 2);
-  }
-
-  function addRule() {
-    const r = {
-      from: els.inFrom.value.trim(),
-      fromContains: els.inFromContains.value.trim(),
-      subjectContains: els.inSubject.value.trim(),
-      targetFolder: els.folderSel.value,
-      action: els.inAction.value
-    };
-    if (!r.targetFolder) { setStatus('elige carpeta', 'err'); return; }
-    if (!r.from && !r.fromContains && !r.subjectContains) { setStatus('define criterio', 'err'); return; }
-    rules.push(r);
-    refreshTable();
-    setStatus('regla agregada', 'ok');
-  }
-
-  // Cargar carpetas
-  async function loadFolders() {
-    try {
-      setStatus('cargando carpetas…');
-      const url = buildUrl(els.foldersPath.value);
-      const res = await fetch(url, { headers: buildHeaders() });
-      if (!res.ok) throw new Error('HTTP '+res.status);
-      const data = await res.json();
-      const folders = (data.folders || []).sort((a,b)=>a.name.localeCompare(b.name));
-      els.folderSel.innerHTML = '<option value="">— selecciona —</option>';
-      folders.forEach(f=>{
-        const opt = document.createElement('option');
-        opt.value = f.name;     // n8n mapea nombre -> id
-        opt.textContent = f.name;
-        els.folderSel.appendChild(opt);
-      });
-      setStatus('carpetas cargadas', 'ok');
-    } catch (e) {
-      console.error(e);
-      setStatus('error al cargar carpetas', 'err');
-      alert('Error: '+ e.message);
-    }
-  }
-
-  // Enviar reglas
-  async function applyRules() {
-    try {
-      if (!rules.length) { setStatus('sin reglas', 'err'); return; }
-      setStatus('enviando…');
-      const url = buildUrl(els.applyPath.value);
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { ...buildHeaders(), 'Content-Type':'application/json' },
-        body: JSON.stringify({ rules })
-      });
-      const text = await res.text();
-      els.response.value = prettifyOrRaw(text);
-      setStatus(res.ok ? 'aplicado' : 'error', res.ok ? 'ok':'err');
-    } catch (e) {
-      console.error(e);
-      setStatus('error en envío', 'err');
-      els.response.value = String(e);
-    }
-  }
-
-  // Utilidades
-  function buildUrl(path) {
-    let base = els.baseUrl.value.trim().replace(/\/+$/,'');
-    if (!base) throw new Error('Base URL vacía');
-    return base + path;
-  }
-  function buildHeaders() {
-    const h = {};
-    const k = els.apiKey.value.trim();
-    if (k) {
-      const [name, ...rest] = k.split(/\s+/);
-      if (rest.length) { h[name] = rest.join(' '); }
-      else { h['X-API-Key'] = k; }
-    }
-    return h;
-  }
-  function prettifyOrRaw(text) {
-    try { return JSON.stringify(JSON.parse(text), null, 2); }
-    catch { return text; }
-  }
-  function escapeHtml(s) { return s.replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
-
-  // Eventos
-  els.btnAdd.addEventListener('click', addRule);
-  els.btnApply.addEventListener('click', applyRules);
-  els.btnClear.addEventListener('click', () => { rules = []; refreshTable(); setStatus('limpiado'); });
-  els.tblBody.addEventListener('click', (e)=>{
-    const i = e.target.getAttribute('data-del');
-    if (i!==null) { rules.splice(Number(i),1); refreshTable(); }
-  });
-  els.btnSaveCfg.addEventListener('click', saveCfg);
-  els.btnLoadFolders.addEventListener('click', loadFolders);
-
-  // Init
-  loadCfg();
-  refreshTable();
-</script>
+  <div id="toast"></div>
+  <script src="app.js"></script>
 </body>
 </html>
